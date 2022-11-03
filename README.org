@@ -1,0 +1,12 @@
+#+TITLE: TCP CHAT TESTING
+#+AUTHORS: Guennadi Maximov Cortés
+#+LANGUAGE: en
+#+DATE: 03-11-2022
+#+OPTIONS: toc:t
+
+* XD											    :title:
+:PROPERTIES:
+:CATEGORY: summary
+:END:
+
+
