@@ -1,0 +1,10 @@
+#+TITLE: Chat TCP
+#+AUTHORS: Michel Paola Osornio Torres, Guennadi Maximov Cortés
+#+LANGUAGE: es
+#+DATE: 03-11-2022
+#+OPTIONS: toc:t
+
+* XD
+:PROPERTIES:
+:CATEGORY: summary
+:END:
