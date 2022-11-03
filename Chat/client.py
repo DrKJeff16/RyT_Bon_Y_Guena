@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Cliente de Chat
 * Autor(es): Michel Paola Osornio Torres, Guennadi Maximov Cortés
-* Última Edición: 02-11-2022
+* Última Edición: 03-11-2022
 """
 import socket as sock
 import sys
@@ -12,12 +12,18 @@ HOST = '127.0.0.1'
 ENC = 'utf-8'
 
 
-def main(PORT: int) -> int:
+def b(*words, sep=' ', enc=ENC) -> bytes:
+    """Convierte una o muchas cadenas a un objeto `bytes` ya codificado."""
+    w_s = sep.join(words)
+    return bytes(w_s, encoding=enc)
+
+
+def main(port: int) -> int:
     """Función principal"""
     ret = 0
 
     sck = sock.socket(sock.AF_INET, sock.SOCK_STREAM)
-    sck.connect((HOST, PORT))
+    sck.connect((HOST, port))
     sleep(5)
 
     try:
@@ -29,11 +35,9 @@ def main(PORT: int) -> int:
         msg1 = sck.recv(1024)
         print(msg1.decode(ENC))
 
-        sck.close()
-
     except KeyboardInterrupt:
         ret = -1
-        print('ABORTING . . .',
+        print('ABORTING...',
               file=sys.stderr)
 
         sck.close()
@@ -47,28 +51,28 @@ def main(PORT: int) -> int:
         sck.close()
         sleep(3)
 
+    sck.close()
+
     return ret
 
 
 if __name__ == '__main__':
-    PORT = 0
+    port = 0
 
-    while PORT <= 0:
+    while port <= 0:
         try:
-            PORT = int(input("Select port: ").strip().lstrip('0'))
-
-            if PORT <= 0:
-                raise ValueError("")
+            print('Seleccione el puerto:', end=' ')
+            port = int(input().strip().lstrip('0'))
 
         except KeyboardInterrupt:
-            print('ABORTING . . .',
+            print('ABORTING...',
                   file=sys.stderr)
 
             sleep(3)
             sys.exit(-1)
 
         except ValueError:
-            print('Invalid Port value, cannot be less than 1!',
+            print(f'Invalid Port value "{port}"',
                   file=sys.stderr)
 
             sleep(3)
@@ -81,4 +85,4 @@ if __name__ == '__main__':
             sleep(3)
             continue
 
-    sys.exit(main(PORT))
+    sys.exit(main(port))

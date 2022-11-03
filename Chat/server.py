@@ -6,11 +6,17 @@
 """
 import socket as sock
 import sys
-import threading as thr
+# import threading as thr
 from time import sleep
 
 HOST = '127.0.0.1'
 ENC = 'utf-8'
+
+
+def b(*words, sep=' ', enc=ENC) -> bytes:
+    """Convierte una o muchas cadenas a un objeto `bytes` ya codificado."""
+    w_s = sep.join(words)
+    return bytes(w_s, encoding=enc)
 
 
 def main(port: int) -> int:
@@ -19,38 +25,45 @@ def main(port: int) -> int:
 
     srv = sock.socket(sock.AF_INET, sock.SOCK_STREAM)
     srv.bind((HOST, port))
-    srv.listen(1)
+    srv.listen()
 
     try:
         while True:
-            csocket, address = srv.accept()
-            print("Connection is stablished: ", address)
-            csocket.send(bytes("Server: You are connected",
-                               encoding=ENC))
-            msg = csocket.recv(1024)
-            print(msg.decode(ENC))
-            sleep(12)
-            csocket.send(bytes("bye"))
-            csocket.close()
+            try:
+                csocket, address = srv.accept()
+                print("Connection is established:", address)
 
-        srv.close()
+                omsg = b("Server: You are connected.")
+                csocket.send(omsg)
+
+                imsg = csocket.recv(1024)
+                print(imsg.decode(ENC))
+                sleep(12)
+                omsg = b("Bye!")
+                csocket.send(omsg)
+
+            except Exception:
+                ret = 2
+
+            finally:
+                csocket.close()
+
     except KeyboardInterrupt:
+        csocket.close()
         ret = -1
-        print("ABORTING . . .",
+        print("ABORTING...",
               file=sys.stderr)
-
-        srv.close()
         sleep(3)
 
     except Exception:
-        ret = 1
+        ret = 2
         print("SOMETHING WENT WRONG...",
               file=sys.stderr)
-
-        srv.close()
         sleep(3)
 
-    return ret
+    finally:
+        srv.close()
+        return ret
 
 
 if __name__ == '__main__':
