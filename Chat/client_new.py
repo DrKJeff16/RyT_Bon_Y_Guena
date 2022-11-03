@@ -16,7 +16,7 @@ ENC = 'utf-8'
 BUF_S = 1024
 
 
-def b(*st: Tuple(AnyStr), enc=ENC, sep=' ') -> bytes:
+def b(*st, enc=ENC, sep=' ') -> bytes:
     """Return an encoded bytes object."""
     return bytes(sep.join(st), encoding=enc)
 
@@ -26,67 +26,66 @@ class Client:
 
     def __init__(self,
                  host: str,
-                 port: int,
-                 **kwargs):
+                 port: int):
         """Constructor Method."""
-        av_keys = {
-                'history': {
-                    'default': True,
-                    'type': 'bool',
-                    'values': {
-                        (None, False, 0, 0.): False
-                    }
-                },
-                'histsize': {
-                    'default': 100,
-                    'type': 'range',
-                    'max': 5000,
-                    'min': 1
-                },
-                'histfile': {
-                    'default': './.history',
-                    'type': 'file',
-                    'depends_on': 'history'
-                },
-                'padx_all': {
-                    'default': 25,
-                    'type': 'range',
-                    'max': 100,
-                    'min': 0,
-                },
-                'pady_all': {
-                    'default': 5,
-                    'type': 'range',
-                    'max': 20,
-                    'min': 0
-                }
-        }
+        # av_keys = {
+        #        'history': {
+        #            'default': True,
+        #            'type': 'bool',
+        #            'values': {
+        #                (None, False, 0, 0.): False
+        #            }
+        #        },
+        #        'histsize': {
+        #            'default': 100,
+        #            'type': 'range',
+        #            'max': 5000,
+        #            'min': 1
+        #        },
+        #        'histfile': {
+        #            'default': './.history',
+        #            'type': 'file',
+        #            'depends_on': 'history'
+        #        },
+        #        'padx_all': {
+        #            'default': 25,
+        #            'type': 'range',
+        #            'max': 100,
+        #            'min': 0,
+        #        },
+        #        'pady_all': {
+        #            'default': 5,
+        #            'type': 'range',
+        #            'max': 20,
+        #            'min': 0
+        #        }
+        # }
 
         # k_types = {
         #    'range': ''
         # }
 
-        processed_keys = set()
+        # processed_keys = set()
 
-        for k, v in kwargs.items():
-            if k not in av_keys.keys():
-                raise KeyError(f'Option "{k}" not found')
+        # for k, v in kwargs.items():
+        #    if k not in av_keys.keys():
+        #        raise KeyError(f'Option "{k}" not found')
 
-            if k not in processed_keys:
-                processed_keys.add(k)
-                instructions = av_keys.get(k)
+        #    if k not in processed_keys:
+        #        processed_keys.add(k)
+        #        instructions = av_keys.get(k)
 
-                if None not in [instructions.get(a, None)
-                    for a in ['min', 'max']] and 'range' 
-                == instructions.get('type'):
-                    if v in instructions.get('except', list()):
-                        raise ValueError(f'Invalid value "{v}"')
+        #        if None not in [instructions.get(a, None)
+        #            for a in ['min', 'max']] and 'range' 
+        #        == instructions.get('type'):
+        #            if v in instructions.get('except', list()):
+        #                raise ValueError(f'Invalid value "{v}"')
 
-                    allowed = range(instructions.get('min'),
-                                    instructions.get('max') + 1)
+        #            allowed = range(instructions.get('min'),
+        #                            instructions.get('max') + 1)
 
-                    if v not in allowed:
-                        raise ValueError(f'Invalid value "{v}"')
+        #            if v not in allowed:
+        #                raise ValueError(f'Invalid value "{v}"')
 
         self.h_p = tuple(host, port)
         self.connected = False
@@ -173,8 +172,12 @@ def main(port_n: int) -> int:
     """Main function."""
     ret = 0
 
+    if port_n <= 0:
+        ret = -1
+
     return ret
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    port_n = input("Select Port: ").strip()
+    sys.exit(main(port_n))

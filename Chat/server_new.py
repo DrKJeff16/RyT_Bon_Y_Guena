@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Servidor de Cht."""
+"""Servidor de Caht."""
 import random as rnd
 import socket as sock
 import string as s
 import sys
 import threading as thr
 from time import sleep
-from typing import AnyStr, NoReturn, Set, Tuple
+from typing import NoReturn, Set, Tuple
 
 HOST = '127.0.0.1'
 ENC = 'utf-8'
@@ -15,9 +15,9 @@ BUF_S = 1024
 MAX_TRIES = 5
 
 
-def b(st: AnyStr, enc=ENC) -> bytes:
+def b(*st, enc=ENC, sep=' ') -> bytes:
     """Convert to encoded bytes"""
-    return bytes(st, encoding=ENC)
+    return bytes(sep.join(st), encoding=ENC)
 
 
 def validate_nick(n_s: str) -> Tuple[bool, str]:
@@ -46,7 +46,7 @@ def validate_nick(n_s: str) -> Tuple[bool, str]:
 
 
 def broadcast(c_s: Set[sock.socket], msg: bytes) -> NoReturn:
-    """Broadcast a Message."""
+    """Broadcast a Message To Everyone."""
     for c_h in c_s:
         c_h.send(msg)
 
@@ -60,9 +60,9 @@ def handle(client: sock.socket,
 
     while True:
         try:
-            msg = client.recv(BUF_S)
-            print(f'[{nick}]: "{msg}"')
-            broadcast(c_s, msg)
+            omsg = client.recv(BUF_S)
+            print(f'[{nick}]: "{omsg}"')
+            broadcast(c_s, omsg)
 
         except Exception:
             c_s.remove(client)
@@ -84,10 +84,10 @@ def receive(srv: sock.socket,
         client, addr = srv.accept()
 
         for i in range(rnd.randint(3, 8)):
-            sleep(rnd.randint(1, 3))
+            sleep(rnd.randint(1, 2))
             print('.', end='')
 
-        sleep(3)
+        sleep(2)
         print(f'Connection established with \'{str(addr)}\'',
               end='\n\n')
         sleep(3)
@@ -123,6 +123,8 @@ def receive(srv: sock.socket,
                             continue
 
                 except KeyboardInterrupt:
+                    sleep(2)
+                    srv.close()
                     sys.exit(-1)
 
                 except Exception:
@@ -131,16 +133,18 @@ def receive(srv: sock.socket,
                           sep='\n',
                           end='\n\n',
                           file=sys.stderr)
-                    srv.close()
                     sleep(3)
+                    srv.close()
                     sys.exit(2)
 
                 finally:
                     tries += 1
-                    sleep(3)
+                    sleep(2)
                     continue
 
         except KeyboardInterrupt:
+            sleep(2)
+            srv.close()
             sys.exit(-1)
 
         if len(nick) == 0:
@@ -215,9 +219,9 @@ if __name__ == '__main__':
     port_n = 0
     tries_n = 1
 
-    while port_n <= 0 and tries_n < MAX_TRIES:
+    while port_n <= 0:
         try:
-            print('Select port: ', end='')
+            print('Select port:', end=' ')
             port_n = int(input().strip().lstrip('0'))
 
             if port_n <= 0:
