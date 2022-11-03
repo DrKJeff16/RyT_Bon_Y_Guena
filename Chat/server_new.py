@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Servidor de Caht."""
+"""Servidor de Chat."""
 import random as rnd
 import socket as sock
 import string as s
