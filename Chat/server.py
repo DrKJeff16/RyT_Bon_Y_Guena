@@ -25,19 +25,23 @@ def b(*words, sep=' ', enc=ENC) -> bytes:
 class Server:
     """Server class."""
 
-    def __init__(self, host: str, port: int, str_id='SERVER', backlog=None):
+    def __init__(self,
+                 host: str,
+                 port: int,
+                 str_id='SERVER',
+                 logf=('./server_history', 'a')):
         """Método Constructor."""
         self.hp_tup = (host, port)
         self.host, self.port = self.hp_tup
         self.id = str_id
-
-        self.backlog = backlog
 
         self.binded = False
         self.listening = False
 
         self.all_clients = set()
         self.active_clients = set()
+        self.taken_addr = set()
+        self.taken_nicks = set()
 
         self.start()
 
@@ -50,33 +54,43 @@ class Server:
             self.sock = sock.socket(sock.AF_INET, sock.SOCK_STREAM)
             self.sock.bind(self.hp_tup)
             self.binded = True
-
-            self.listen()
-
-        elif self._start_cond() == [True, True]:
-            pass
-
-        elif self._start_cond() == [True, False]:
-            self.listen()
-
-    def listen(self) -> NoReturn:
-        """Start Listening"""
-        if self._start_cond() == [True, False]:
-            if self.backlog is None:
-                self.sock.listen()
-            else:
-                self.sock.listen(self.backlog)
-
+            self.sock.listen()
             self.listening = True
 
-        elif self._start_cond() == [True, True]:
-            pass
+    def accept(self):
+        """Acepta un socket."""
+        client, addr = self.sock.accept()
+        is_new = True
+        req_nick = True
 
-        elif self._start_cond() == [False, False]:
-            self.start()
+        for d in self.all_clients:
+            if client == d.get('csock') and addr == d.get('addr'):
+                is_new = False
 
-        else:
-            sys.exit(1)
+                if d.get('nick', False):
+                    req_nick = False
+
+                break
+
+        if is_new and req_nick:
+            avail_nick = False
+            omsg = 'Welcome! Please input your nickname: '
+            while not avail_nick:
+                client.send(b(omsg))
+
+                nick = client.recv(BUF_S).decode(ENC)
+                # TODO: Add Validator, import string module
+                if len(self.taken_nicks) == 0:
+                    avail_nick = True
+                    self.taken_nicks.add(nick)
+
+                elif nick not in self.taken_nicks:
+                    avail_nick = True
+                    self.taken_nicks.add(nick)
+
+                else:
+                    omsg = f'Username {nick} is already taken. Please try again: '
+                    continue
 
     def close(self, t=30) -> NoReturn:
         if t in [int, float]:
@@ -99,22 +113,6 @@ class Server:
         self.sock.close()
         self.binded = False
         self.listening = False
-
-
-class Client:
-    """Client class."""
-
-    def __init__(self, srv: sock.socket):
-        """Constructor Method."""
-        self.sock, self.addr = srv.accept()
-        self.connected = True
-
-        self.imsg = list()
-        self.omsg = list()
-
-    def serv_send(self, *args: Tuple[str]) -> NoReturn:
-        """Send a message to client from server."""
-        pass
 
 
 def main(port: int) -> int:
