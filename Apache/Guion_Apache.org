@@ -1,0 +1,62 @@
+#+TITLE: Guión Apache
+#+LANGUAGE: es
+#+AUTHOR: Guennadi Maximov Cortés
+#+DATE: 27-09-2022
+#+OPTIONS: toc:nil
+
+* PASO I: Instalar Apache en Arch
+
+En distribuciones tipo Arch Linux, existe el paquete ~apache~ en los
+repositorios, el cual se descarga del siguiente modo:
+
+#+BEGIN_SRC bash
+sudo pacman -S apache
+#+END_SRC
+
+* PASO II: Iniciar el Servidor Apache
+
+Una vez instalado el paquete de ~apache~, este se activa con el siguiente
+comando:
+
+#+BEGIN_SRC bash
+sudo systemctl enable --now httpd.service
+#+END_SRC
+
+* PASO III: Configurar el Servidor Apache
+
+Los archivos de configuración de ~apache~ existen en el directorio
+~/etc/httpd/conf~, siendo el archivo ~httpd.conf~ el principal. Si lo
+editamos de cualquier modo, tenemos que reiniciar el Servidor Apache con el
+siguiente comando:
+
+#+BEGIN_SRC bash
+sudo systemctl restart --now httpd.service
+#+END_SRC
+
+* PASO IV: Abrir el Servidor a la Red Local
+
+Por defecto, el servidor Apache que instalamos está montado en la dirección
+IP ~127.0.0.1~, bajo el alias ~localhost~. Si queremos una URL en particular,
+agregamos el alias al archivo ~/etc/hosts~.
+
+* PASO V: Crear Un "Hola Mundo"
+
+El directorio raíz por defecto en Arch Linux existe en la ruta ~/srv/http~,
+aunque en otras distribuciones podría existir, por ejemplo, en la ruta
+~/var/www/...~
+
+Creamos un archivo HTML ~index.html~ en ese directorio, diciendo "Hola, Mundo!".
+
+#+BEGIN_SRC bash
+sudo touch /srv/http/index.html
+#+END_SRC
+
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="es">
+  <body>
+    Hola, Mundo!
+  </body>
+</html>
+#+END_SRC
+
