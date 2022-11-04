@@ -134,3 +134,15 @@ dmypy.json
 *.tmp
 *.exe
 *.bin
+*.mkv
+*.log
+*.out
+*.xml
+*.bbl
+*.aux
+*.toc
+TAGS
+*.odt
+*.odp
+*.doc
+*.docx
