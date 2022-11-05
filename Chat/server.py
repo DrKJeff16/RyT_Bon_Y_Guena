@@ -4,11 +4,13 @@
 * Autor(es): Michel Paola Osornio Torres, Guennadi Maximov Cortés
 * Última Edición: 02-11-2022
 """
+import random as rnd
 import socket as sock
+from string import punctuation as pnc
 import sys
 # import threading as thr
 from time import sleep
-from typing import List, NoReturn, Tuple
+from typing import Dict, List, NoReturn, Set, Tuple
 
 HOST = '127.0.0.1'
 PORT = 6060
@@ -24,95 +26,135 @@ def b(*words, sep=' ', enc=ENC) -> bytes:
 
 class Server:
     """Server class."""
+    host: str
+    port: int
+    s_id: str
+    binded: bool
+    listening: bool
+    all_clients: Dict[Tuple[str, int]: Dict[str: bool, str: str]]
+    srv: sock.socket
+    # active_clients: Set[Tuple[sock.socket, Tuple[str, int]]]
+    # taken_addr: Dict
+    # taken_nicks: Dict
 
     def __init__(self,
                  host: str,
                  port: int,
-                 str_id='SERVER',
-                 logf=('./server_history', 'a')):
+                 s_id='SERVER'):
         """Método Constructor."""
-        self.hp_tup = (host, port)
-        self.host, self.port = self.hp_tup
-        self.id = str_id
+        self.host = host
+        self.port = port
+        self.s_id = s_id
 
         self.binded = False
         self.listening = False
 
-        self.all_clients = set()
-        self.active_clients = set()
-        self.taken_addr = set()
-        self.taken_nicks = set()
+        self.all_clients = dict()
+        self.srv = None
 
         self.start()
 
-    def _start_cond(self) -> List[bool, bool]:
-        return [self.binded, self.listening]
+    def addr(self) -> Tuple[str, int]:
+        """Retorna la tupla host-puerto"""
+        return self.host, self.port
 
     def start(self) -> NoReturn:
         """Inicializa el servidor con los sockets."""
-        if self._start_cond() == [False, False]:
-            self.sock = sock.socket(sock.AF_INET, sock.SOCK_STREAM)
-            self.sock.bind(self.hp_tup)
+        if not self.binded:
+            self.srv = sock.socket(sock.AF_INET, sock.SOCK_STREAM)
+            self.srv.bind(self.addr())
             self.binded = True
-            self.sock.listen()
-            self.listening = True
 
     def accept(self):
         """Acepta un socket."""
-        client, addr = self.sock.accept()
-        is_new = True
-        req_nick = True
+        if not self.listening:
+            self.listening = True
+            self.srv.listen()
+            client, addr = self.srv.accept()
+            self.listening = False
 
-        for d in self.all_clients:
-            if client == d.get('csock') and addr == d.get('addr'):
-                is_new = False
+            cli_dict = self.all_clients.get((client, addr), None)
 
-                if d.get('nick', False):
-                    req_nick = False
+            if cli_dict is None:
+                cli_dict = {(client, addr): {
+                    'online': True
+                }}
+            else:
+                cli_dict[(client, addr)].update({'online': True})
 
-                break
+            if cli_dict[(client, addr)].get('nick', None) is None:
+                try:
+                    cli_dict[(client, addr)].update({
+                        'nick': self.ask_nick((client, addr))
+                    })
+                except ConnectionError:
+                    cli_dict[(client, addr)]['online'] = False
+                    cli_dict[(client, addr)].update({
+                        'nick': None
+                    })
+                except ConnectionResetError:
+                    cli_dict[(client, addr)]['online'] = False
+                    cli_dict[(client, addr)].update({
+                        'nick': None
+                    })
+                except ConnectionAbortedError:
+                    cli_dict[(client, addr)]['online'] = False
+                    cli_dict[(client, addr)].update({
+                        'nick': None
+                    })
+                except ConnectionRefusedError:
+                    cli_dict[(client, addr)]['online'] = False
+                    cli_dict[(client, addr)].update({
+                        'nick': None
+                    })
+                except KeyboardInterrupt:
+                    self.close(1)
+                    sys.exit(-1)
 
-        if is_new and req_nick:
-            avail_nick = False
-            omsg = 'Welcome! Please input your nickname: '
-            while not avail_nick:
-                client.send(b(omsg))
+    def ask_nick(self, c_a: Tuple[sock.socket, Tuple[str, int]]) -> str:
+        """Pide al usuario su nickname."""
+        cli = c_a[0]
 
-                nick = client.recv(BUF_S).decode(ENC)
-                # TODO: Add Validator, import string module
-                if len(self.taken_nicks) == 0:
-                    avail_nick = True
-                    self.taken_nicks.add(nick)
+        prompt = 'Bienvenido, usuario!', 'Ingrese su nickname.'
+        while True:
+            print(*prompt, sep='\n', end='\n\n')
+            cli.send(b(prompt[0]))
+            cli.send(b(prompt[1]))
+            nick = cli.recv(BUF_S).decode(ENC).strip()
 
-                elif nick not in self.taken_nicks:
-                    avail_nick = True
-                    self.taken_nicks.add(nick)
+            cond = (
+                    len(nick) == 0,
+                    nick.isascii(),
+                    any([c in ''.join(
+                        [p for p in pnc if p not in '._-'] + ' \t\r\n')
+                         for c in nick]))
 
-                else:
-                    omsg = f'Username {nick} is already taken. Please try again: '
-                    continue
+            if not all(cond):
+                prompt = 'INVALID', 'Vuelva a intentarlo.'
+                cli.send(b(prompt[0]))
+                cli.send(b(prompt[1]))
+            else:
+                prompt = 'VALID', f'Bienvenido/a, {nick}'
+                cli.send(b(prompt[0]))
+                cli.send(b(prompt[1]))
+                return nick
 
-    def close(self, t=30) -> NoReturn:
-        if t in [int, float]:
-            t = abs(int(t))
+    def close(self, t=10) -> NoReturn:
+        active_clients = set()
 
-            if t == 0 or t >= 1800:
-                t = 30
-
-        elif t not in [int]:
-            t = 30
-
-        for c in self.active_clients:
-            c.send(b("[{SERVIDOR}]: El servidor se cerrará en {t} segundos."))
+        for c_a, attrs in zip(self.all_clients.keys(), self.all_clients.values()):
+            if attrs.get('online'):
+                c = c_a[0]
+                c.send(b(f'[{self.s_id}]: Cierre del servidor en {t} segundos...'))
+                active_clients.add(c)
 
         sleep(t)
 
-        for c in self.active_clients:
+        for c in active_clients:
             c.close()
 
-        self.sock.close()
+        self.srv.close()
         self.binded = False
-        self.listening = False
 
 
 def main(port: int) -> int:
