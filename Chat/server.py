@@ -8,6 +8,14 @@ BUF_S = 1024                    # Tamaño del buffer
 ENC = "utf-8"                   # Encoding por defecto
 
 
+def cod_msj(*cad):
+    """Convierte cadenas a `bytes` codificados."""
+    # Combina todas las cadenas en
+    cadena_total = ' '.join(cad)
+
+    return bytes(cadena_total, encoding=ENC)
+
+
 # Crea una variable `server`, de la clase `socket` con dos
 # Parámetros especiales.
 # Esta variable es el servidor del Chat.
