@@ -49,6 +49,7 @@ class Computadora:
 
     def ping(self, other, count=None, bs=None) -> None:
         """Comunica con otra computadora.
+
         Si no hay una conexión entre estas dos computadoras, conectarlas
         insertando en sus conjuntos de conexiones respectivos.
         """
@@ -118,7 +119,7 @@ def select_comp(comps: list, curr=None) -> int:
 def select_op(curr: int, comps: list) -> bool:
     """Selecciona una operación."""
     while True:
-        print('Operaciones Válidas:',
+        print('\nOperaciones Válidas:',
               '1) Comunicarse con otra máquina.',
               '2) Imprimir tabla ARP de máquina actual.',
               '\n\t0) Cambiar de máquina.',
@@ -128,15 +129,25 @@ def select_op(curr: int, comps: list) -> bool:
         op = int(input("Seleccione la operacion deseada: ").strip())
 
         if op == 0:
+            # Indica que se quiere seleccionar otra máquina.
             return False
 
         if op == -1:
+            # Indica que quiere salir del programa.
             return True
 
         if op == 1:
+            # Elige un índice aleatorio `oth` de la lista de computadoras
+            # En existencia `comps`
             oth = rnd.randrange(len(comps))
+
+            # La computadora actual de índice `curr`
+            # Invoca su método `ping()` con la otra
+            # Computadora seleccionada de índice `oth`
             comps[curr].ping(comps[oth])
+
         elif op == 2:
+            # Imprime la tabla ARP de la computadora seleccionada
             comps[curr].arp_table()
 
 
