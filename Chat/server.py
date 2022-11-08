@@ -31,15 +31,16 @@ server.listen()
 
 try:
     while True:
-        clientsocket, address = server.accept()
+        client, address = server.accept()
         print("Connection is stablished", address)
-        clientsocket.send(bytes("Server: You are connected", encoding=ENC))
-        msg = clientsocket.recv(BUF_S)
+        client.send(cod_msj("Server: You are connected"))
+        msg = client.recv(BUF_S)
         print(msg.decode(ENC))
-        time.sleep(120)
-        clientsocket.send(bytes("bye"))
-        clientsocket.close()
+        time.sleep(5)
+        client.send(cod_msj("bye"))
+        client.close()
+
 except KeyboardInterrupt:
-    print("Finishing . . .")
+    print("Finishing...")
 
 server.close()
