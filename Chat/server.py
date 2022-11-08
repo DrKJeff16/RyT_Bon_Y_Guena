@@ -1,5 +1,5 @@
 import socket
-import time
+from time import sleep
 
 # VARIABLES GLOBALES
 HOST = '127.0.0.1'              # Host del servidor (localhost)
@@ -29,18 +29,23 @@ server.bind((HOST, PORT))
 # Activa el servidor para que "escuche" otras conexiones
 server.listen()
 
-try:
-    while True:
+while True:
+    try:
         client, address = server.accept()
-        print("Connection is stablished", address)
-        client.send(cod_msj("Server: You are connected"))
-        msg = client.recv(BUF_S)
-        print(msg.decode(ENC))
-        time.sleep(5)
-        client.send(cod_msj("bye"))
+        print("Connection established with address", address)
+        client.send(cod_msj("HOST: You are connected."))
+        msg = client.recv(BUF_S).decode(ENC)
+        print(msg)
+        sleep(5)
+        client.send(cod_msj("Desconectado por timeout."))
         client.close()
 
-except KeyboardInterrupt:
-    print("Finishing...")
+    except KeyboardInterrupt:
+        # Si el programa es abortado por `^C` (CTRL + c),
+        # En lugar de abortar por completo el programa,
+        # Hacer lo siguiente
+        print("Abortando...")
+        client.close()
+        break
 
 server.close()
