@@ -30,8 +30,8 @@ if __name__ == '__main__':
     # Activa el servidor para que "escuche" otras conexiones
     server.listen()
 
-    try:
-        while True:
+    while True:
+        try:
             # Espera a que algún cliente se conecte.
             # Cuando lo haga, almacena el socket en `client`
             # Y su dirección `(HOST, PORT)` en `direc`.
@@ -39,20 +39,43 @@ if __name__ == '__main__':
             cad_direc = f'{direc[0]}:{direc[1]}'
             print(f"Cliente conectado: {cad_direc}")
 
-            client.send(cod_msj(f"[{HOST}:{PORT}]: Connectado."))
+            # Envía el primer mensaje al cliente.
+            omsg = f'[{HOST}:{PORT}]: Connectado.'
+            client.send(cod_msj(omsg))
+
+            # Espera una respuesta del cliente.
+            # Una vez conseguida, decodificar e imprimir.
             imsg = client.recv(BUF_S).decode(ENC)
             print(f'[{cad_direc}]: {imsg}')
-            sleep(16)
-            client.send(cod_msj(f"[{HOST}:{PORT}]: Desconectado por timeout."))
+
+            # Dar un tiempo de espera.
+            # Al terminar, anunciar al cliente que será
+            # Desconectado, para posteriormente cerrarlo.
+            sleep(6)
+            print(f'Desconectando: {cad_direc}...')
+            omsg = f"[{HOST}:{PORT}]: Desconectado por timeout."
+            client.send(cod_msj(omsg))
+            sleep(2)
             client.close()
+            print("Esperando...")
 
-    except KeyboardInterrupt:
-        # Si el programa es abortado por `^C` (CTRL + c),
-        # En lugar de abortar por completo el programa,
-        # Hacer lo siguiente
-        print("Abortando...")
-        # client.close()
+        except KeyboardInterrupt:
+            # Si el programa es abortado por `^C` (CTRL + c),
+            # En lugar de abortar por completo el programa,
+            # Hacer lo siguiente
+            print("\nAbortando...")
+            client.close()
+            break
 
-    finally:
-        server.close()
-        sys.exit(0)
+        except ConnectionError:
+            print("El cliente no está disponible.")
+
+        except ConnectionAbortedError:
+            print("El cliente ha abortado la conexión")
+
+        except Exception:
+            print("Hubo un error.")
+            break
+
+    server.close()
+    sys.exit(0)

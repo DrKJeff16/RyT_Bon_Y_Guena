@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
         # Codifica y manda `omsg` al servidor,
         # Que debería estar esperando por algún mensaje.
-        omsg = "[CLIENTE]: ¡Hola! ¡Soy un nuevo cliente!"
+        omsg = "¡Hola! ¡Soy un nuevo cliente!"
         cli_sock.send(cod_msj(omsg))
 
         # Espera un mensaje de despedida del servidor,
@@ -48,7 +48,7 @@ if __name__ == '__main__':
               f'en {HOST}:{PORT}')
 
     except ConnectionAbortedError:
-        # TODO: Se cerró el servidor(?)
+        # Se cerró el servidor.
         print("ERROR: Se perdió la conexión con el servidor.")
 
     except KeyboardInterrupt:
