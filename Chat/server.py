@@ -24,7 +24,7 @@ if __name__ == '__main__':
     # Esta variable es el servidor del Chat.
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    # Aloja el servidor en el HOST:PORT
+    # Intenta alojar el servidor en `HOST:PORT`
     server.bind((HOST, PORT))
 
     # Activa el servidor para que "escuche" otras conexiones
@@ -32,17 +32,19 @@ if __name__ == '__main__':
 
     try:
         while True:
-            try:
-                client, address = server.accept()
-                print("Connection established with address", address)
-                client.send(cod_msj("HOST: You are connected."))
-                msg = client.recv(BUF_S).decode(ENC)
-                print(msg)
-                sleep(8)
-                client.send(cod_msj("Desconectado por timeout."))
+            # Espera a que algún cliente se conecte.
+            # Cuando lo haga, almacena el socket en `client`
+            # Y su dirección `(HOST, PORT)` en `direc`.
+            client, direc = server.accept()
+            cad_direc = f'{direc[0]}:{direc[1]}'
+            print(f"Cliente conectado: {cad_direc}")
 
-            finally:
-                client.close()
+            client.send(cod_msj(f"[{HOST}:{PORT}]: Connectado."))
+            imsg = client.recv(BUF_S).decode(ENC)
+            print(f'[{cad_direc}]: {imsg}')
+            sleep(16)
+            client.send(cod_msj(f"[{HOST}:{PORT}]: Desconectado por timeout."))
+            client.close()
 
     except KeyboardInterrupt:
         # Si el programa es abortado por `^C` (CTRL + c),
