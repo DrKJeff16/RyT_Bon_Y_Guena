@@ -8,14 +8,14 @@ BUF_S = 1024                    # Tamaño del buffer
 ENC = "utf-8"                   # Encoding por defecto
 
 
-def cod_msj(*cad):
+def cod_msj(*cad, sep=' ', enc=ENC):
     """Convierte cadenas a `bytes` codificados `utf-8`."""
     # Combina todas las cadenas en la variable `cad`,
     # Que es una lista de n cadenas, en una sola cadena,
-    # Separadas c/u por un espacio.
-    cadena_total = ' '.join(cad)
+    # Separadas c/u por un separador.
+    cadena_total = sep.join(cad)
 
-    return bytes(cadena_total, encoding=ENC)
+    return bytes(cadena_total, encoding=enc)
 
 
 # Crea una variable `server`, de la clase `socket` con dos
