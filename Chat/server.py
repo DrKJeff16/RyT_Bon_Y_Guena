@@ -9,7 +9,7 @@ ENC = "utf-8"                   # Encoding por defecto
 
 
 def cod_msj(*cad):
-    """Convierte cadenas a `bytes` codificados."""
+    """Convierte cadenas a `bytes` codificados `utf-8`."""
     # Combina todas las cadenas en la variable `cad`,
     # Que es una lista de n cadenas, en una sola cadena,
     # Separadas c/u por un espacio.
