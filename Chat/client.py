@@ -42,9 +42,9 @@ if __name__ == '__main__':
         # `CTRL + c`
         print("Abortando.")
 
-    except Exception:
-        # Cualquier otro error.
-        print('Algo salió mal.')
+    # except Exception:
+    #    # Cualquier otro error.
+    #    print('Algo salió mal.')
 
     finally:
         cli_sock.close()
