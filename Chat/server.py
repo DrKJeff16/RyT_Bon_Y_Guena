@@ -1,4 +1,5 @@
 import socket
+import sys
 from time import sleep
 
 # VARIABLES GLOBALES
@@ -14,38 +15,42 @@ def cod_msj(*cad, sep=' ', enc=ENC):
     # Que es una lista de n cadenas, en una sola cadena,
     # Separadas c/u por un separador.
     cadena_total = sep.join(cad)
-
     return bytes(cadena_total, encoding=enc)
 
 
-# Crea una variable `server`, de la clase `socket` con dos
-# Parámetros especiales.
-# Esta variable es el servidor del Chat.
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+if __name__ == '__main__':
+    # Crea una variable `server`, de la clase `socket` con dos
+    # Parámetros especiales.
+    # Esta variable es el servidor del Chat.
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Aloja el servidor en el HOST:PORT
-server.bind((HOST, PORT))
+    # Aloja el servidor en el HOST:PORT
+    server.bind((HOST, PORT))
 
-# Activa el servidor para que "escuche" otras conexiones
-server.listen()
+    # Activa el servidor para que "escuche" otras conexiones
+    server.listen()
 
-while True:
     try:
-        client, address = server.accept()
-        print("Connection established with address", address)
-        client.send(cod_msj("HOST: You are connected."))
-        msg = client.recv(BUF_S).decode(ENC)
-        print(msg)
-        sleep(5)
-        client.send(cod_msj("Desconectado por timeout."))
-        client.close()
+        while True:
+            try:
+                client, address = server.accept()
+                print("Connection established with address", address)
+                client.send(cod_msj("HOST: You are connected."))
+                msg = client.recv(BUF_S).decode(ENC)
+                print(msg)
+                sleep(8)
+                client.send(cod_msj("Desconectado por timeout."))
+
+            finally:
+                client.close()
 
     except KeyboardInterrupt:
         # Si el programa es abortado por `^C` (CTRL + c),
         # En lugar de abortar por completo el programa,
         # Hacer lo siguiente
         print("Abortando...")
-        client.close()
-        break
+        # client.close()
 
-server.close()
+    finally:
+        server.close()
+        sys.exit(0)
