@@ -18,18 +18,32 @@ def cod_msj(*cad, sep=' ', enc=ENC):
 
 
 if __name__ == '__main__':
+    # Primero Crea El Socket Del Cliente,
+    # Un objeto de tipo `socket.socket()`
     cli_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     try:
+        # Conecta con el servidor dados
+        # `HOST` y `PORT`
         cli_sock.connect((HOST, PORT))
 
+        # Espera un mensaje del servidor,
+        # De ahí decodificar e imprimir.
         msg1 = cli_sock.recv(BUF_S).decode(ENC)
         print(msg1)
-        cli_sock.send(cod_msj("[CLIENTE]: ¡Hola! Soy un nuevo cliente!"))
+
+        # Codifica y manda `omsg` al servidor,
+        # Que debería estar esperando por algún mensaje.
+        omsg = "[CLIENTE]: ¡Hola! ¡Soy un nuevo cliente!"
+        cli_sock.send(cod_msj(omsg))
+
+        # Espera un mensaje de despedida del servidor,
+        # De ahí decodificar e imprimir.
         msg2 = cli_sock.recv(BUF_S).decode(ENC)
         print(msg2)
 
     except ConnectionError:
-        # No hay ningún servidor en la ruta indicada
+        # No hay ningún servidor en la ruta indicada.
         print("ERROR: No hay ningún servidor activo",
               f'en {HOST}:{PORT}')
 
@@ -38,15 +52,19 @@ if __name__ == '__main__':
         print("ERROR: Se perdió la conexión con el servidor.")
 
     except KeyboardInterrupt:
-        # Si este programa se cancela usando
-        # `CTRL + c`
+        # Si este programa se cancela usando `^C`
+        # (`CTRL + c`)
         print("Abortando.")
+
+    # TODO: Decidir si incluir cualquier otra excepción
+    #       genérica.
 
     # except Exception:
     #    # Cualquier otro error.
     #    print('Algo salió mal.')
 
     finally:
+        # Haya o no haya error, cerrar cliente.
         cli_sock.close()
 
     sys.exit(0)
