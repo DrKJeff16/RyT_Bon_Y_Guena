@@ -2,7 +2,7 @@
 
 * Autores: Michel Paola Osornio Torres, Guennadi Maximov Cortés
 * Fecha de Creación: 12/10/2022
-* Última Edición: 24/10/2022
+* Última Edición: 10/11/2022
 """
 import sys
 import random as rnd
