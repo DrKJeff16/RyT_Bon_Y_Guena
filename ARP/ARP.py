@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Ejercicio de emulación de ARP, para la clase de Redes y Telecomunicaciones.
 
 * Autores: Michel Paola Osornio Torres, Guennadi Maximov Cortés
@@ -10,49 +8,105 @@ import sys
 import random as rnd
 from time import sleep
 from collections import deque as dq
+from typing import List, NoReturn, Set, Tuple
 
 
 class Computadora:
     """Crea un objeto de tipo computadora."""
+    cid: int
+    ip_addr: str
+    mac_addr: str
+    conns: Set[Tuple[int, str, str]]
 
-    def __init__(self, ip_addr: str, mac_addr: str, cid: int):
-        """Método Constructor."""
-        self.id = cid
+    def __init__(self, ip_addr, mac_addr, cid):
+        """Método constructor de un objeto de tipo computadora.
+
+        Invocado al crear una nueva instancia:
+        `comp_1 = Computadora('192.168.0.1', '....', 3)`
+        """
+        # ID de la instancia, usado también como índice,
+        # Pero entonces su uso es `indice = computadora_n.cid - 1`.
+        self.cid = cid
+
+        # Direcciones IP y MAC de la instancia, ambas almacenadas en
+        # Forma de cadena.
         self.ip_addr = ip_addr
         self.mac_addr = mac_addr
 
-        self.pair = (self.id, self.ip_addr, self.mac_addr)
-        self.conns = set()  # Con qué computadoras me he comunicado?
+        # Conjunto que almacena la
+        self.conns = set()
         self.conns.add(self.pair)
 
+    def pair(self) -> Tuple[int, str, str]:
+        """Retorna la tupla `(cid, ip_addr, mac_addr)` de la instancia."""
+        return self.cid, self.ip_addr, self.mac_addr
+
     def __eq__(self, other) -> bool:
-        """Checa si pueden comunicarse dos computadoras."""
-        return [int(val[0]) == int(val[1]) for k, val in
-                enumerate(zip(list(self.ip_addr.split('.')),
-                              list(other.ip_addr.split('.'))))
-                ] in (list([True] * 4),
-                      list([True] * 3) + [False])
+        """Compara a dos objetos de la clase Computadora a nuestro gusto.
+
+        Es decir, manipulamos el operador de igualdad `==`,
+        el cual compara de la forma dada por esta función
+        especial `__eq__`.
+        """
+        # Primero almacenamos las direcciones IP, en forma de lista
+        # Separando por cada `.`.
+        ip_1 = self.ip_addr.split('.')
+        ip_2 = other.ip_addr.split('.')
+
+        # Crearemos una lista en la que se almacenarán las comparaciones
+        # Ordenadas, de izquierda a derecha, de ambas direcciones IP.
+        lista_bools = list()
+
+        # Iteramos utilizando las funciones
+        # `enumerate()` y `zip()` para que nos dé, por cada iteración,
+        # La tupla `(ind, par)`, donde `ind` es el índice, y
+        # `par` es una tupla que contiene los `ind`-ésimos elementos
+        # De ambas listas `ip_1` e `ip_2`:
+        # `[(ip_1[0], ip_2[0]), (ip_1[1], ip_2[1]), ...]`.
+        for num1, num2 in zip(ip_1, ip_2):
+            # Agrega al final de `lista_bools` `True` o `False`
+            # Si coinciden o no, respectivamente.
+            lista_bools.append(int(num1) == int(num2))
+
+        # Convierte `lista_bools` a una tupla.
+        lista_bools = tuple(lista_bools.copy())
+
+        # TODO: Explicar estos bloques.
+        valores_true = ((True, True, True, True), (True, True, True, False))
+
+        return lista_bools in valores_true
 
     def __repr__(self) -> str:
+        """Indica cómo se presenta el objeto al ser imprimido.
+
+        e.g. `print(comp_n)`.
+        """
         return f'"{self.pair[0]}": IP: {self.pair[1]}\tMAC: {self.pair[2]}\n'
 
     def __int__(self) -> int:
-        return self.id
+        """Simplemente retorna `self.cid` al convertir en `int` la instancia.
 
-    def arp_table(self) -> None:
+        e.g. `indice = int(comp_n) - 1`.
+        """
+        return self.cid
+
+    def arp_table(self) -> NoReturn:
         """Imprime la tabla de ARP."""
+        # TODO: Explicar.
         D = dq(self.conns)
         D.remove(self.pair)
         D.appendleft(self.pair)
         for name, ip, mac in D:
             print(f'{name}\t{ip}\t{mac}')
 
-    def ping(self, other, count=None, bs=None) -> None:
-        """Comunica con otra computadora.
+    def ping(self, other) -> NoReturn:
+        """Comunica la computadora actual con otra y actualizar ARP.
 
-        Si no hay una conexión entre estas dos computadoras, conectarlas
-        insertando en sus conjuntos de conexiones respectivos.
+        Si las computadoras no pertenecen a la misma red, i.e.
+        `comp_x != comp_y`, esto quiere decir que no se pueden comunicar
+        entre ellas, dado el método `__eq__`.
         """
+        # TODO: Explicar.
         if self != other:
             print(f'\'{int(self)}\' ({self.ip_addr})'
                   f'y \'{int(other)}\' ({other.ip_addr})',
@@ -60,33 +114,24 @@ class Computadora:
                   file=sys.stderr)
             return
 
-        if other.pair not in self.conns or self.pair not in other.conns:
+        if any([other.pair not in self.conns, self.pair not in other.conns]):
             self.conns.add(other.pair)
             other.conns.add(self.pair)
 
-        if count is None:
-            count = rnd.randint(5, 14)
-        elif count <= 0:
-            count = rnd.randint(5, 14)
+        n_bytes = 64
+        count = 10
+        t = .5
 
-        if bs is None:
-            bs = rnd.choice([64, 32, 16, 8, 4, 2, 1, 128, 256, 512])
-        elif bs <= 0:
-            bs = rnd.choice([64, 32, 16, 8, 4, 2, 1, 128, 256, 512])
-
-        for c in range(1, count + 1):
-            t = float(rnd.randint(5, 10)) * (bs / (bs + 1)) / 11
+        for c in range(count):
             sleep(t)
-            print(f'\tEnviado Paquete #{c}/{count} ({bs} bytes) de la',
-                  f'dirección {self.ip_addr} a la dirección',
-                  f'{other.ip_addr}, t={int(t*100)}ms')
+            print(f'\tEnviado Paquete #{c} de {count + 1} ({n_bytes} bytes):',
+                  f'{self.ip_addr} ===> {other.ip_addr}.',
+                  f't={int(t * 100)}ms')
 
 
-def select_comp(comps: list, curr=None) -> int:
+def select_comp(comps: List[Computadora], curr=-1) -> int:
     """Selecciona una computadora."""
-    if curr is not None and curr not in [int(c) - 1 for c in comps]:
-        raise ValueError("")
-
+    # TODO: Explicar.
     exc = curr
 
     while True:
@@ -97,27 +142,20 @@ def select_comp(comps: list, curr=None) -> int:
             print(f'|\t{int(c)}\t|\t{c.ip_addr}\t|\t{c.mac_addr}\t|')
 
         comp = input("Ingrese la ID de computadora que desee utilizar: ")
-        comp = int(comp.strip().lstrip('0'))
+        comp = int(comp.strip())
 
-        if exc is None:
-            if comp in [int(c) for c in comps]:
-                return int(comp) - 1
-        elif exc is not None:
-            if comp - 1 == exc:
-                print(f'La computadora \'{comp}\' ya esta seleccionada.',
-                      file=sys.stderr)
-            elif comp in [int(c) for c in comps]:
-                return int(comp) - 1
-            else:
-                print(f'La computadora \'{comp}\' no parece existir.',
-                      file=sys.stderr)
+        if comp in [int(c) for c in comps]:
+            return int(comp) - 1
+
+        if comp - 1 == exc:
+            print(f'La computadora "{comp}" ya esta seleccionada.')
         else:
-            print(f'La computadora \'{comp}\' no parece existir.',
-                  file=sys.stderr)
+            print(f'La computadora \'{comp}\' no parece existir.')
 
 
-def select_op(curr: int, comps: list) -> bool:
+def select_op(curr: int, comps: List[Computadora]) -> bool:
     """Selecciona una operación."""
+    # TODO: Explicar.
     while True:
         print('\nOperaciones Válidas:',
               '1) Comunicarse con otra máquina.',
@@ -153,6 +191,7 @@ def select_op(curr: int, comps: list) -> bool:
 
 def main() -> int:
     """Función principal."""
+    # TODO: Explicar.
     # Abrimos el archivo de las IPs y MACs
     with open('./ip_macs.txt', 'r') as file:
         ip_mac = [ln.strip().strip('\r').strip('\n').strip('\t').split(',')
