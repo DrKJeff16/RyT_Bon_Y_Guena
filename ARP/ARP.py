@@ -12,7 +12,7 @@ from typing import List, NoReturn, Set, Tuple
 
 
 class Computadora:
-    """Crea un objeto de tipo computadora."""
+    """Objeto de tipo computadora."""
     cid: int
     ip_addr: str
     mac_addr: str
@@ -33,9 +33,12 @@ class Computadora:
         self.ip_addr = ip_addr
         self.mac_addr = mac_addr
 
-        # Conjunto que almacena la
+        # Conjunto que almacena las computadoras con las que la instancia
+        # Se ha comunicado exitosamente, i.e. la tabla ARP.
         self.conns = set()
-        self.conns.add(self.pair)
+
+        # Agrega a esta instancia por defecto.
+        self.conns.add(self.pair())
 
     def pair(self) -> Tuple[int, str, str]:
         """Retorna la tupla `(cid, ip_addr, mac_addr)` de la instancia."""
@@ -71,9 +74,14 @@ class Computadora:
         # Convierte `lista_bools` a una tupla.
         lista_bools = tuple(lista_bools.copy())
 
-        # TODO: Explicar estos bloques.
+        # Dos posibilidades para que se puedan comunicar
+        # Dos computadoras:
+        #     1) La IP es exactamente la misma.
+        #     2) La IP es distinta en el último valor, pero
+        #        se encuentra en la misma red.
         valores_true = ((True, True, True, True), (True, True, True, False))
 
+        # Retorna si `lista_bools` es alguna de las dos tuplas anteriores o no.
         return lista_bools in valores_true
 
     def __repr__(self) -> str:
@@ -81,7 +89,8 @@ class Computadora:
 
         e.g. `print(comp_n)`.
         """
-        return f'"{self.pair[0]}": IP: {self.pair[1]}\tMAC: {self.pair[2]}\n'
+        # Retorna una cadena formateada al invocar `print()`.
+        return f'{self.pair()[0]}: IP:{self.pair()[1]}\tMAC:{self.pair()[2]}\n'
 
     def __int__(self) -> int:
         """Simplemente retorna `self.cid` al convertir en `int` la instancia.
@@ -91,13 +100,21 @@ class Computadora:
         return self.cid
 
     def arp_table(self) -> NoReturn:
-        """Imprime la tabla de ARP."""
-        # TODO: Explicar.
+        """Imprime la tabla de ARP de la instancia."""
+        # Creamos una cola doble, importada como la clase `dq`.
+        # A este objeto `D` se le asigna la cola doble construida
+        # A partir de la tabla ARP `self.conns`.
         D = dq(self.conns)
+
+        # Quitamos la computadora de `D`, para ponerla al principio
+        # (`D.appendleft()`) de la cola.
         D.remove(self.pair)
         D.appendleft(self.pair)
+
+        # Imprimimos cada tupla formateada de cada computadora
+        # En la tabla ARP.
         for name, ip, mac in D:
-            print(f'{name}\t{ip}\t{mac}')
+            print(f'| {name} | {ip} | {mac} |')
 
     def ping(self, other) -> NoReturn:
         """Comunica la computadora actual con otra y actualizar ARP.
@@ -110,10 +127,11 @@ class Computadora:
         if self != other:
             print(f'\'{int(self)}\' ({self.ip_addr})'
                   f'y \'{int(other)}\' ({other.ip_addr})',
-                  'no pueden comunicarse!',
-                  file=sys.stderr)
+                  'no pueden comunicarse!')
             return
 
+        # Si alguna computadora no se encuentra en la tabla ARP de la otra,
+        # Agregar una a la tabla de la otra.
         if any([other.pair not in self.conns, self.pair not in other.conns]):
             self.conns.add(other.pair)
             other.conns.add(self.pair)
