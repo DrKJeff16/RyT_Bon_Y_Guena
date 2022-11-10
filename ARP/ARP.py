@@ -1,4 +1,7 @@
-"""Ejercicio de emulación de ARP, para la clase de Redes y Telecomunicaciones.
+"""
+Ejercicio de simulación de tablas ARP.
+
+Para la clase de Redes y Telecomunicaciones.
 
 * Autores: Michel Paola Osornio Torres, Guennadi Maximov Cortés
 * Fecha de Creación: 12/10/2022
@@ -13,10 +16,12 @@ from typing import List, NoReturn, Set, Tuple
 
 class Computadora:
     """Objeto de tipo computadora."""
+    # IGNORAR: Utilizado para tener autocompletado y diagnósticos
+    #          en el editor.
     cid: int
     ip_addr: str
     mac_addr: str
-    conns: Set[Tuple[int, str, str]]
+    table_set: Set[Tuple[int, str, str]]
 
     def __init__(self, ip_addr, mac_addr, cid):
         """Método constructor de un objeto de tipo computadora.
@@ -35,10 +40,10 @@ class Computadora:
 
         # Conjunto que almacena las computadoras con las que la instancia
         # Se ha comunicado exitosamente, i.e. la tabla ARP.
-        self.conns = set()
+        self.table_set = set()
 
         # Agrega a esta instancia por defecto.
-        self.conns.add(self.pair())
+        self.table_set.add(self.pair())
 
     def pair(self) -> Tuple[int, str, str]:
         """Retorna la tupla `(cid, ip_addr, mac_addr)` de la instancia."""
@@ -103,8 +108,8 @@ class Computadora:
         """Imprime la tabla de ARP de la instancia."""
         # Creamos una cola doble, importada como la clase `dq`.
         # A este objeto `D` se le asigna la cola doble construida
-        # A partir de la tabla ARP `self.conns`.
-        D = dq(self.conns)
+        # A partir de la tabla ARP `self.table_set`.
+        D = dq(self.table_set)
 
         # Quitamos la computadora de `D`, para ponerla al principio
         # (`D.appendleft()`) de la cola.
@@ -123,19 +128,23 @@ class Computadora:
         `comp_x != comp_y`, esto quiere decir que no se pueden comunicar
         entre ellas, dado el método `__eq__`.
         """
-        # TODO: Explicar.
+        # Ver si la instancia actual `self` puede comunicarse con
+        # La otra `other`
         if self != other:
-            print(f'\'{int(self)}\' ({self.ip_addr})'
-                  f'y \'{int(other)}\' ({other.ip_addr})',
+            print(f'{int(self)} ({self.ip_addr})'
+                  f'y {int(other)} ({other.ip_addr})',
                   'no pueden comunicarse!')
             return
 
         # Si alguna computadora no se encuentra en la tabla ARP de la otra,
         # Agregar una a la tabla de la otra.
-        if any([other.pair not in self.conns, self.pair not in other.conns]):
-            self.conns.add(other.pair)
-            other.conns.add(self.pair)
+        if any([other.pair not in self.table_set,
+                self.pair not in other.table_set]):
+            self.table_set.add(other.pair)
+            other.table_set.add(self.pair)
 
+        # Emular el comando de terminal `ping`, enviando 10 mensajes cada medio
+        # Segundo
         n_bytes = 64
         count = 10
         t = .5
@@ -148,7 +157,7 @@ class Computadora:
 
 
 def select_comp(comps: List[Computadora], curr=-1) -> int:
-    """Selecciona una computadora."""
+    """Menú de selección de computadora."""
     # TODO: Explicar.
     exc = curr
 
