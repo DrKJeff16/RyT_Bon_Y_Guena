@@ -5,7 +5,7 @@ Para la clase de Redes y Telecomunicaciones.
 
 * Autores: Michel Paola Osornio Torres, Guennadi Maximov Cortés
 * Fecha de Creación: 12/10/2022
-* Última Edición: 10/11/2022
+* Última Edición: 11/11/2022
 """
 import sys
 import random as rnd
@@ -80,7 +80,7 @@ class Computadora:
         lista_bools = tuple(lista_bools.copy())
 
         # Dos posibilidades para que se puedan comunicar
-        # Dos computadoras:
+        # Dos computadoras, en orden:
         #     1) La IP es exactamente la misma.
         #     2) La IP es distinta en el último valor, pero
         #        se encuentra en la misma red.
@@ -134,6 +134,8 @@ class Computadora:
             print(f'{int(self)} ({self.ip_addr})'
                   f'y {int(other)} ({other.ip_addr})',
                   'no pueden comunicarse!')
+
+            # Retornar vacío
             return
 
         # Si alguna computadora no se encuentra en la tabla ARP de la otra,
