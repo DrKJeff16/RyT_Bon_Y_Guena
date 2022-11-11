@@ -158,28 +158,42 @@ class Computadora:
                   f't={int(t * 100)}ms')
 
 
-def select_comp(comps: List[Computadora], curr=-1) -> int:
-    """Menú de selección de computadora."""
-    # TODO: Explicar.
-    exc = curr
+def select_comp(l_comps: List[Computadora], curr=-1) -> int:
+    """Menú de selección de computadoras.
 
+    El parámetro `curr` consiste en indicar el índice ó `cid` de la
+    computadora, pero empezando en 0 en lugar de 1.
+    Cuando no hay computadora seleccionada, `curr` es -1 por defecto.
+    """
+    delay = 0.2
+
+    # Crear un bucle sin terminar que, por cada iteración, se vuelva a
+    # Pedir entrada de usuario hasta que sea válida.
     while True:
-        top = '|\tComputadora\t|\tIP\t|\tMAC\t|'
-        print(top, '=' * len(top), sep='\n')
+        sleep(delay)
+        top = '\n|\tComputadora\t|\tIP\t|\tMAC\t|'
 
-        for c in comps:
-            print(f'|\t{int(c)}\t|\t{c.ip_addr}\t|\t{c.mac_addr}\t|')
+        # Imprime el tope de la tabla.
+        print(top)
 
-        comp = input("Ingrese la ID de computadora que desee utilizar: ")
-        comp = int(comp.strip())
+        for c in l_comps:
+            # Por cada computadora en la lista de todas las computadoras
+            # (`l_comps`), imprime una fila de la tabla.
+            sleep(delay)
+            print(f'|\t#{int(c)}\t|\t{c.ip_addr}\t|\t{c.mac_addr}\t|')
 
-        if comp in [int(c) for c in comps]:
+        print('\n\nIngrese la ID de la computadora que desee utilizar:',
+              end=' ')
+        comp = input().strip()
+        comp = int(comp)
+
+        if comp in [int(c) for c in l_comps]:
             return int(comp) - 1
 
-        if comp - 1 == exc:
-            print(f'La computadora "{comp}" ya esta seleccionada.')
+        if comp - 1 == curr:
+            print(f'La computadora #{comp} ya esta seleccionada.')
         else:
-            print(f'La computadora \'{comp}\' no parece existir.')
+            print(f'La computadora #{comp} no parece existir.')
 
 
 def select_op(curr: int, comps: List[Computadora]) -> bool:
