@@ -11,11 +11,12 @@ import sys
 import random as rnd
 from time import sleep
 from collections import deque as dq
-from typing import List, NoReturn, Set, Tuple
+from typing import List, Set, Tuple
 
 
 class Computadora:
     """Objeto de tipo computadora."""
+
     # IGNORAR: Utilizado para tener autocompletado y diagnósticos
     #          en el editor.
     cid: int
@@ -104,7 +105,7 @@ class Computadora:
         """
         return self.cid
 
-    def arp_table(self) -> NoReturn:
+    def arp_table(self) -> None:
         """Imprime la tabla de ARP de la instancia."""
         # Creamos una cola doble, importada como la clase `dq`.
         # A este objeto `D` se le asigna la cola doble construida
@@ -121,7 +122,7 @@ class Computadora:
         for name, ip, mac in D:
             print(f'| {name} | {ip} | {mac} |')
 
-    def ping(self, other) -> NoReturn:
+    def ping(self, other) -> None:
         """Comunica la computadora actual con otra y actualizar ARP.
 
         Si las computadoras no pertenecen a la misma red, i.e.
