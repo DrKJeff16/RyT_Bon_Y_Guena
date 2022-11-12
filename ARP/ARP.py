@@ -5,13 +5,16 @@ Para la clase de Redes y Telecomunicaciones.
 
 * Autores: Michel Paola Osornio Torres, Guennadi Maximov Cortés
 * Fecha de Creación: 12/10/2022
-* Última Edición: 11/11/2022
+* Última Edición: 12/11/2022
 """
-import sys
+import os
 import random as rnd
-from time import sleep
+import sys
 from collections import deque as dq
-from typing import List, Set, Tuple
+from time import sleep
+from typing import List
+from typing import Set
+from typing import Tuple
 
 
 class Computadora:
@@ -24,7 +27,7 @@ class Computadora:
     mac_addr: str
     table_set: Set[Tuple[int, str, str]]
 
-    def __init__(self, ip_addr, mac_addr, cid):
+    def __init__(self, ip_addr: str, mac_addr: str, cid: int):
         """Método constructor de un objeto de tipo computadora.
 
         Invocado al crear una nueva instancia:
@@ -43,7 +46,7 @@ class Computadora:
         # Se ha comunicado exitosamente, i.e. la tabla ARP.
         self.table_set = set()
 
-        # Agrega a esta instancia por defecto.
+        # Agrega a esta instancia a su tabla ARP por defecto.
         self.table_set.add(self.pair())
 
     def pair(self) -> Tuple[int, str, str]:
@@ -78,7 +81,7 @@ class Computadora:
             lista_bools.append(int(num1) == int(num2))
 
         # Convierte `lista_bools` a una tupla `t_bools`.
-        t_bools = tuple(lista_bools.copy())
+        t_bools = tuple(lista_bools)
 
         # Dos posibilidades para que se puedan comunicar
         # Dos computadoras, en orden:
@@ -87,7 +90,7 @@ class Computadora:
         #        se encuentra en la misma red.
         valores_true = ((True, True, True, True), (True, True, True, False))
 
-        # Retorna si `lista_bools` es alguna de las dos tuplas anteriores o no.
+        # Retorna si `t_bools` es alguna de las dos tuplas anteriores o no.
         return t_bools in valores_true
 
     def __repr__(self) -> str:
@@ -96,7 +99,7 @@ class Computadora:
         e.g. `print(comp_n)`.
         """
         # Retorna una cadena formateada al invocar `print()`.
-        return f'{self.pair()[0]}: IP:{self.pair()[1]}\tMAC:{self.pair()[2]}\n'
+        return f'{self.pair()[0]}\t{self.pair()[1]} - {self.pair()[2]}'
 
     def __int__(self) -> int:
         """Simplemente retorna `self.cid` al convertir en `int` la instancia.
@@ -126,17 +129,14 @@ class Computadora:
         """Comunica la computadora actual con otra y actualizar ARP.
 
         Si las computadoras no pertenecen a la misma red, i.e.
-        `comp_x != comp_y`, esto quiere decir que no se pueden comunicar
+        `comp_x != comp_y` es `True` si no se pueden comunicar
         entre ellas, dado el método `__eq__`.
         """
         # Ver si la instancia actual `self` puede comunicarse con
         # La otra `other`
         if self != other:
-            print(f'{int(self)} ({self.ip_addr})'
-                  f'y {int(other)} ({other.ip_addr})',
-                  'no pueden comunicarse!')
-
             # Retornar vacío
+            print(f'"{self}" y "{other}" no pueden comunicarse.')
             return
 
         # Si alguna computadora no se encuentra en la tabla ARP de la otra,
@@ -264,36 +264,68 @@ def select_op(curr: int, comps: List[Computadora]) -> bool:
 
 
 def main() -> int:
-    """Función principal."""
-    # TODO: Explicar.
-    # Abrimos el archivo de las IPs y MACs
-    with open('./ip_macs.txt', 'r') as file:
-        ip_mac = [ln.strip().strip('\r').strip('\n').strip('\t').split(',')
-                  for ln in file.readlines()]
+    """Función de ejecución principal.
 
-    ip_L, mac_L = list(), list()
+    Esta función es llamada en el bloque de hasta abajo
+    `if __name__ == '__main__: ...`,
+    que solamente es válido si el archivo es ejecutado como
+    programa/script.
+    """
+    # Nombre por defecto del archivo.
+    nom_arch = 'ip_macs.txt'
 
-    for ip, mac in ip_mac:
-        ip_L.append(ip)
-        mac_L.append(mac)
+    # Si por casualidad no existe el archivo por defecto.
+    while not os.path.exists(f'./{nom_arch}'):
+        try:
+            print(f"\nEl archivo './{nom_arch}' no parece existir, vuelva a intentarlo: ",
+                  end='')
+            nom_arch = input().strip().strip('/')
 
-    ip_L.sort(key=lambda x: int(x.split('.')[3]))
-    ip_L.sort(key=lambda x: int(x.split('.')[2]))
+        except KeyboardInterrupt:
+            print("\nCancelando...\n")
+            return 1
 
-    mac_L = rnd.sample(mac_L.copy(), len(mac_L))
-    comp_act = None
+        finally:
+            continue
 
-    comps = [Computadora(ip, mac, id_c) for ip, mac, id_c in
-             zip(ip_L, mac_L, list(range(1, len(ip_L) + 1)))]
+    # Una vez que existe el archivo, leerlo.
+    # Abrimos el archivo de las IPs y MACs.
+    with open(f'./{nom_arch}', 'r') as file:
+        ip_lista = list()
+        mac_lista = list()
 
+        all_lineas = file.readlines()
+
+        for linea in all_lineas:
+            separado = linea.strip().strip('\r').strip('\n').split(',')
+
+            ip_lista.append(separado[0])
+            mac_lista.append(separado[1])
+
+    # Ordenamos `ip_lista` primero respecto al último grupo,
+    # Luego respecto al penúltimo grupo.
+    ip_lista.sort(key=lambda x: int(x.split('.')[3]))
+    ip_lista.sort(key=lambda x: int(x.split('.')[2]))
+
+    # Ordenamos `mac_lista` aleatoriamente.
+    mac_lista = rnd.sample(mac_lista.copy(), len(mac_lista))
+
+    comps = list()
+    id_c = 1
+    for ip, mac in zip(ip_lista, mac_lista):
+        comps.append(Computadora(ip, mac, id_c))
+        id_c += 1
+
+    id_c = -1
     salir = False
 
     while not salir:
-        comp_act = select_comp(comps, comp_act)
-        salir = select_op(comp_act, comps)
+        id_c = select_comp(comps, id_c)
+        salir = select_op(id_c, comps)
 
     return 0
 
 
+# Si el archivo es llamado como programa...
 if __name__ == '__main__':
     sys.exit(main())
