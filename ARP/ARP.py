@@ -77,8 +77,8 @@ class Computadora:
             # Si coinciden o no, respectivamente.
             lista_bools.append(int(num1) == int(num2))
 
-        # Convierte `lista_bools` a una tupla.
-        lista_bools = tuple(lista_bools.copy())
+        # Convierte `lista_bools` a una tupla `t_bools`.
+        t_bools = tuple(lista_bools.copy())
 
         # Dos posibilidades para que se puedan comunicar
         # Dos computadoras, en orden:
@@ -88,7 +88,7 @@ class Computadora:
         valores_true = ((True, True, True, True), (True, True, True, False))
 
         # Retorna si `lista_bools` es alguna de las dos tuplas anteriores o no.
-        return lista_bools in valores_true
+        return t_bools in valores_true
 
     def __repr__(self) -> str:
         """Indica cómo se presenta el objeto al ser imprimido.
@@ -108,18 +108,18 @@ class Computadora:
     def arp_table(self) -> None:
         """Imprime la tabla de ARP de la instancia."""
         # Creamos una cola doble, importada como la clase `dq`.
-        # A este objeto `D` se le asigna la cola doble construida
+        # A este objeto `cola_arp` se le asigna la cola doble construida
         # A partir de la tabla ARP `self.table_set`.
-        D = dq(self.table_set)
+        cola_arp = dq(self.table_set)
 
-        # Quitamos la computadora de `D`, para ponerla al principio
-        # (`D.appendleft()`) de la cola.
-        D.remove(self.pair)
-        D.appendleft(self.pair)
+        # Quitamos la computadora de `cola_arp`, para ponerla al principio
+        # (`cola_arp.appendleft()`) de la cola.
+        cola_arp.remove(self.pair)
+        cola_arp.appendleft(self.pair)
 
         # Imprimimos cada tupla formateada de cada computadora
         # En la tabla ARP.
-        for name, ip, mac in D:
+        for name, ip, mac in cola_arp:
             print(f'| {name} | {ip} | {mac} |')
 
     def ping(self, other) -> None:
@@ -162,8 +162,9 @@ class Computadora:
 def select_comp(l_comps: List[Computadora], curr=-1) -> int:
     """Menú de selección de computadoras.
 
-    El parámetro `curr` consiste en indicar el índice ó `cid` de la
+    El parámetro `curr` consiste en indicar el índice (`cid`) de la
     computadora, pero empezando en 0 en lugar de 1.
+
     Cuando no hay computadora seleccionada, `curr` es -1 por defecto.
     """
     delay = 0.2
@@ -198,39 +199,61 @@ def select_comp(l_comps: List[Computadora], curr=-1) -> int:
 
 
 def select_op(curr: int, comps: List[Computadora]) -> bool:
-    """Selecciona una operación."""
-    # TODO: Explicar.
+    """Selecciona una operación efectuada en una computadora dada.
+
+    Dada la lista `comps` y el ID `curr`, se busca obtener entrada de usuario.
+    La entrada dada determina la operación, siendo las variantes:
+
+    - `-1`: Salir del programa (retornar `True`).
+    - `0`: Cambiar de computadora (retornar `False`).
+    - `1`: Comunicarse con otra máquina.
+    - `2`: Imprimir tabla ARP de máquina actual.
+    """
+    # Pide entrada indefinidamente.
     while True:
-        print('\nOperaciones Válidas:',
-              '1) Comunicarse con otra máquina.',
-              '2) Imprimir tabla ARP de máquina actual.',
-              '\n\t0) Cambiar de máquina.',
-              '-1) Salir del programa.',
-              sep='\n\t',
-              end='\n\n')
-        op = int(input("Seleccione la operacion deseada: ").strip())
+        try:
+            print('\nOperaciones Válidas:',
+                  '\t1) Comunicarse con otra máquina.',
+                  '\t2) Imprimir tabla ARP de máquina actual.',
+                  '',
+                  '\t0) Cambiar de máquina.',
+                  '\t-1) Salir del programa.',
+                  sep='\n')
 
-        if op == 0:
-            # Indica que se quiere seleccionar otra máquina.
-            return False
+            print("\nSeleccione la operacion deseada:", end=' ')
+            op = int(input().strip())
 
-        if op == -1:
-            # Indica que quiere salir del programa.
+            if op == 0:
+                # Indica que se quiere seleccionar otra máquina.
+                return False
+
+            if op == -1:
+                # Indica que quiere salir del programa.
+                return True
+
+            if op == 1:
+                # Elige un índice aleatorio `oth` de la lista de computadoras
+                # En existencia `comps`
+
+                # TODO: Pedir entrada de usuario.
+                oth = rnd.randrange(len(comps))
+
+                # La computadora actual de índice `curr`
+                # Invoca su método `ping()` con la otra
+                # Computadora seleccionada de índice `oth`
+                comps[curr].ping(comps[oth])
+
+            elif op == 2:
+                # Imprime la tabla ARP de la computadora seleccionada
+                comps[curr].arp_table()
+
+        except KeyboardInterrupt:
+            print('Cancelando...\n')
             return True
 
-        if op == 1:
-            # Elige un índice aleatorio `oth` de la lista de computadoras
-            # En existencia `comps`
-            oth = rnd.randrange(len(comps))
-
-            # La computadora actual de índice `curr`
-            # Invoca su método `ping()` con la otra
-            # Computadora seleccionada de índice `oth`
-            comps[curr].ping(comps[oth])
-
-        elif op == 2:
-            # Imprime la tabla ARP de la computadora seleccionada
-            comps[curr].arp_table()
+        finally:
+            print("Entrada invalida, vuelva a intentarlo.\n")
+            continue
 
 
 def main() -> int:
