@@ -172,30 +172,37 @@ def select_comp(l_comps: List[Computadora], curr=-1) -> int:
     # Crear un bucle sin terminar que, por cada iteración, se vuelva a
     # Pedir entrada de usuario hasta que sea válida.
     while True:
-        sleep(delay)
-        top = '\n|\tComputadora\t|\tIP\t|\tMAC\t|'
-
-        # Imprime el tope de la tabla.
-        print(top)
-
-        for c in l_comps:
-            # Por cada computadora en la lista de todas las computadoras
-            # (`l_comps`), imprime una fila de la tabla.
+        try:
             sleep(delay)
-            print(f'|\t#{int(c)}\t|\t{c.ip_addr}\t|\t{c.mac_addr}\t|')
+            top = '\n|\tComputadora\t|\tIP\t|\tMAC\t|'
 
-        print('\n\nIngrese la ID de la computadora que desee utilizar:',
-              end=' ')
-        comp = input().strip()
-        comp = int(comp)
+            # Imprime el tope de la tabla.
+            print(top)
 
-        if comp in [int(c) for c in l_comps]:
-            return int(comp) - 1
+            for c in l_comps:
+                # Por cada computadora en la lista de todas las computadoras
+                # (`l_comps`), imprime una fila de la tabla.
+                sleep(delay)
+                print(f'|\t#{int(c)}\t|\t{c.ip_addr}\t|\t{c.mac_addr}\t|')
 
-        if comp - 1 == curr:
-            print(f'La computadora #{comp} ya esta seleccionada.')
-        else:
-            print(f'La computadora #{comp} no parece existir.')
+            print('\n\nIngrese la ID de la computadora que desee utilizar: ',
+                  end='')
+            comp = int(input().strip())
+
+            if comp in [int(c) for c in l_comps]:
+                return int(comp) - 1
+
+            if comp - 1 == curr:
+                print(f'La computadora #{comp} ya esta seleccionada.')
+            else:
+                print(f'La computadora #{comp} no parece existir.')
+
+        except KeyboardInterrupt:
+            print("Cancelando...\n")
+            sys.exit(1)
+
+        finally:
+            continue
 
 
 def select_op(curr: int, comps: List[Computadora]) -> bool:
