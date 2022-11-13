@@ -294,9 +294,14 @@ def main() -> int:
         ip_lista = list()
         mac_lista = list()
 
+        # Nos da una lista de todas las líneas del archivo,
+        # Sin quitarles los caracteres "newline" `\n` ó `\r`.
         all_lineas = file.readlines()
 
         for linea in all_lineas:
+            # Quita de los extremos los espacios, los
+            # "carriage return" `\r` y los saltos de línea `\n`
+            # E intenta separar por comas.
             separado = linea.strip().strip('\r').strip('\n').split(',')
 
             ip_lista.append(separado[0])
@@ -310,19 +315,31 @@ def main() -> int:
     # Ordenamos `mac_lista` aleatoriamente.
     mac_lista = rnd.sample(mac_lista.copy(), len(mac_lista))
 
+    # Inicializamos la lista de las computadoras disponibles
+    # `comps`, y el indice de la computadora, empezando por 1.
     comps = list()
     id_c = 1
+
+    # Generaos todas las computadoras en orden y les vamos
+    # Asignando la ID `id_c` incrementalmente.
     for ip, mac in zip(ip_lista, mac_lista):
         comps.append(Computadora(ip, mac, id_c))
         id_c += 1
 
+    # Ahora utilizamos id_c como el índice de la computadora
+    # Actual (por defecto -1), y `salir` que será la variable
+    # Que sirva como condición de paro para el ciclo inminente.
     id_c = -1
     salir = False
 
+    # Mientras `salir` sea falso, seleccionamos una computadora
+    # Y luego determinamos `salir` a partir de las operaciones de esa
+    # Computadora.
     while not salir:
         id_c = select_comp(comps, id_c)
         salir = select_op(id_c, comps)
 
+    # Retorna 0 por defecto a `sys.exit()` en el bloque ejecutor de abajo.
     return 0
 
 
