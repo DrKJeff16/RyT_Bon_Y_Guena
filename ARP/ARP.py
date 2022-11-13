@@ -239,22 +239,41 @@ def select_op(curr: int, comps: List[Computadora]) -> bool:
                 return True
 
             if op == 1:
-                # Elige un índice aleatorio `oth` de la lista de computadoras
+                # Elige un índice aleatorio `indice_oth` de la lista de computadoras
                 # En existencia `comps`
 
-                # TODO: Pedir entrada de usuario.
-                oth = rnd.randrange(len(comps))
+                indice_oth = 0
+
+                while True:
+                    try:
+                        print("Seleccione cualquier otra (o la misma) computadora:",
+                              end=' ')
+
+                        indice_oth = int(input().strip())
+
+                        if indice_oth - 1 in range(len(comps)):
+                            indice_oth -= 1
+                            break
+
+                    except KeyboardInterrupt:
+                        # Aborta el programa.
+                        print('Cancelando...\n')
+                        return True
+
+                    finally:
+                        continue
 
                 # La computadora actual de índice `curr`
                 # Invoca su método `ping()` con la otra
-                # Computadora seleccionada de índice `oth`
-                comps[curr].ping(comps[oth])
+                # Computadora seleccionada de índice `indice_oth`
+                comps[curr].ping(comps[indice_oth])
 
             elif op == 2:
                 # Imprime la tabla ARP de la computadora seleccionada
                 comps[curr].arp_table()
 
         except KeyboardInterrupt:
+            # Aborta el programa.
             print('Cancelando...\n')
             return True
 
