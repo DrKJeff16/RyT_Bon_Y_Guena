@@ -56,9 +56,6 @@ if __name__ == '__main__':
         # (`CTRL + c`)
         print("Abortando.")
 
-    # TODO: Decidir si incluir cualquier otra excepción
-    #       genérica.
-
     # except Exception:
     #    # Cualquier otro error.
     #    print('Algo salió mal.')
