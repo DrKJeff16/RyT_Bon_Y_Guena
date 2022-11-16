@@ -1,4 +1,42 @@
+If:
+  PathMatch: [.*\.h, include/.*\.h]
+  PathExclude: /usr/include/.*
+Diagnostics:
+  UnusedIncludes: None
+InlayHints:
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+Hover:
+  ShowAKA: Yes
 CompileFlags:
-  Add: [-O2, -g, -g3, -ggdb, -Wall, -Wextra, -I./C/include, -I./C, -L./C/lib, -L./C, -pedantic, -pthread]
+  Add: [-xc, -Wall, -Wextra, -I.]
+  Remove: -W*
+  Compiler: gcc
+
+---
+
+If:
+  PathMatch: [.*\.hpp, .*\.hh, .*\.h++, .*\.H, include/.*\.hpp, include/.*\.hh, include/.*\.h++, include/.*\.H]
+  PathExclude: /usr/include/.*
+Diagnostics:
+  UnusedIncludes: Strict
+InlayHints:
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+Hover:
+  ShowAKA: Yes
+CompileFlags:
+  Add: [-xc++, -Wall, -Wextra, -I., -pedantic]
+  Remove: -W*
+  Compiler: g++
+
+---
+
+If:
+  PathMatch: .*\.c
+CompileFlags:
+  Add: [-xc, -O2, -g, -g3, -ggdb, -Wall, -Wextra, -Iinclude, -I., -Llib, -L., -pedantic, -pthread]
   Remove: [-Wempty-translation-unit]
   Compiler: gcc
