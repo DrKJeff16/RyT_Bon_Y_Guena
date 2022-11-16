@@ -10,14 +10,14 @@ InlayHints:
 Hover:
   ShowAKA: Yes
 CompileFlags:
-  Add: [-xc, -Wall, -Wextra, -I.]
+  Add: [-xc, -Wall, -I.]
   Remove: -W*
   Compiler: gcc
 
 ---
 
 If:
-  PathMatch: [.*\.hpp, .*\.hh, .*\.h++, .*\.H, include/.*\.hpp, include/.*\.hh, include/.*\.h++, include/.*\.H]
+  PathMatch: [.*\.hpp, .*\.hh, .*\.H, include/.*\.hpp, include/.*\.hh, include/.*\.H]
   PathExclude: /usr/include/.*
 Diagnostics:
   UnusedIncludes: Strict
@@ -28,7 +28,7 @@ InlayHints:
 Hover:
   ShowAKA: Yes
 CompileFlags:
-  Add: [-xc++, -Wall, -Wextra, -I., -pedantic]
+  Add: [-xc++, -Wall, -I., -pedantic]
   Remove: -W*
   Compiler: g++
 
@@ -36,6 +36,14 @@ CompileFlags:
 
 If:
   PathMatch: .*\.c
+Diagnostics:
+  UnusedIncludes: Strict
+InlayHints:
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+Hover:
+  ShowAKA: Yes
 CompileFlags:
   Add: [-xc, -O2, -g, -g3, -ggdb, -Wall, -Wextra, -Iinclude, -I., -Llib, -L., -pedantic, -pthread]
   Remove: [-Wempty-translation-unit]

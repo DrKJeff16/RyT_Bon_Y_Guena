@@ -85,6 +85,6 @@ typedef struct sockaddr_in sa_in;
 static int ONE = 1;
 static const int *VAL = &ONE;
 
-ush csum(ush *buf, int nwords);
+static ush csum(const ush *buf, const ul nwords);
 
 #endif // MAIN_H
