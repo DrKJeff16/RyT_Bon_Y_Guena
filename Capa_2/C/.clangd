@@ -1,3 +1,0 @@
-CompileFlags:
-  Add: [-O2, -g, -g3, -ggdb, -Wall, -Wextra, -Iinclude, -I., -Llib, -L., -pedantic, -pthread]
-  Compiler: gcc
