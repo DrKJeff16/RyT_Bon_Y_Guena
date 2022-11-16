@@ -3,7 +3,7 @@
  * @author Guennadi Maximov (g.maxc.fox@protonmail.com)
  * @brief Archivo de Cabecera local.
  * @version 0.1
- * @date 2022-11-15
+ * @date 2022-11-16
  *
  * @copyright Copyright (c) 2022
  *
