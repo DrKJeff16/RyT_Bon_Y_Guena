@@ -1,4 +1,0 @@
-CompileFlags:
-  Add: [-O2, -g, -g3, -ggdb, -Wall, -Wextra, -I./C/include, -I./C, -L./C/lib, -L./C, -pedantic, -pthread]
-  Remove: [-Wempty-translation-unit]
-  Compiler: gcc
