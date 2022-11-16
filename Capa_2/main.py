@@ -5,5 +5,10 @@ import sys
 import socket as sock
 
 
+def main() -> int:
+    """Función de Ejecución principal."""
+    return 0
+
+
 if __name__ == '__main__':
-    sys.exit(0)
+    sys.exit(main())
