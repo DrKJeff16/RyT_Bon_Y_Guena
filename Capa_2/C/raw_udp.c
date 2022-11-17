@@ -32,7 +32,20 @@ int main(int argc, char **argv) {
 	sin.sin_addr.s_addr = inet_addr(argv[1]);
 	din.sin_addr.s_addr = inet_addr(argv[3]);
 
-	// FALTA MUCHO...
+	// Fabricate the IP header or we can use the
+
+// standard header structures but assign our own values.
+ip->iph_ihl = 5;
+ip->iph_ver = 4;
+ip->iph_tos = 16; // Low delay
+ip->iph_len = sizeof(ip_head_t) + sizeof(udp_head_t);
+ip->iph_ident = htons(54321);
+ip->iph_ttl = 64; // hops
+ip->iph_protocol = 17; // UDP
+// Source IP address, can use spoofed address here!!!
+ip->iph_sourceip = inet_addr(argv[1]);
+// The destination IP address
+ip->iph_destip = inet_addr(argv[3]);
 
 	return 0;
 }
