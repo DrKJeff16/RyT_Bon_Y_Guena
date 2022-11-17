@@ -3,7 +3,7 @@
  * @author Guennadi Maximov (g.maxc.fox@protonmail.com)
  * @brief Archivo de Cabecera local.
  * @version 0.1
- * @date 2022-11-16
+ * @date 2022-11-17
  *
  * @copyright Copyright (c) 2022
  *
@@ -13,9 +13,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#ifndef PCKT_LEN
 #define PCKT_LEN 8192
-#endif // PCKT_LEN
 
 // TODO: Explicar Cada Inclusión de Header File (`*.h`)
 
