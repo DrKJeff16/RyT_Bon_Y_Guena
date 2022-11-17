@@ -80,7 +80,7 @@ typedef struct TcpHeader {
 	ush tcph_urgptr;
 } tcp_head_t;
 
-typedef struct sockaddr_in sa_in;
+typedef struct sockaddr_in sockaddr_IN;
 
 static int ONE = 1;
 static const int *VAL = &ONE;
