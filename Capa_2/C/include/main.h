@@ -45,6 +45,7 @@ typedef struct IpHeader {
 	ui iph_sourceip;
 	ui iph_destip;
 } ip_head_t;
+#define IPH_S sizeof(ip_head_t)
 
 // TODO: Entender que es esto.
 typedef struct UdpHeader {
@@ -53,6 +54,7 @@ typedef struct UdpHeader {
 	ush udph_len;
 	ush udph_chksum;
 } udp_head_t;
+#define UDPH_S sizeof(udp_head_t)
 
 // TODO: Entender que es esto.
 typedef struct TcpHeader {
@@ -77,12 +79,8 @@ typedef struct TcpHeader {
 	ush tcph_chksum;
 	ush tcph_urgptr;
 } tcp_head_t;
+#define TCPH_S sizeof(tcp_head_t)
 
 typedef struct sockaddr_in sockaddr_IN;
-
-static int ONE = 1;
-static const int *VAL = &ONE;
-
-static ush csum(const ush *buf, const ul nwords);
 
 #endif // MAIN_H
