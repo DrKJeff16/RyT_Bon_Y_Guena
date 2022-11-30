@@ -153,3 +153,19 @@ TAGS
 
 .vscode
 .commitlintrc*
+
+*.zip
+*.pcap
+*.7z
+*.tar
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.xz
+*.gz
+*.bz2
+*.tar
+*.tgz
+*.tbz2
+
+*bin/

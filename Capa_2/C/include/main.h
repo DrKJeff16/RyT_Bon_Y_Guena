@@ -45,7 +45,12 @@ typedef struct IpHeader {
 	ui iph_sourceip;
 	ui iph_destip;
 } ip_head_t;
+<<<<<<< HEAD
 #define IPH_S sizeof(ip_head_t)
+||||||| parent of 513c383 (Cosas nuevas.)
+=======
+#define IPH_SIZE sizeof(ip_head_t)
+>>>>>>> 513c383 (Cosas nuevas.)
 
 // TODO: Entender que es esto.
 typedef struct UdpHeader {
@@ -54,7 +59,12 @@ typedef struct UdpHeader {
 	ush udph_len;
 	ush udph_chksum;
 } udp_head_t;
+<<<<<<< HEAD
 #define UDPH_S sizeof(udp_head_t)
+||||||| parent of 513c383 (Cosas nuevas.)
+=======
+#define UDPH_SIZE sizeof(udp_head_t)
+>>>>>>> 513c383 (Cosas nuevas.)
 
 // TODO: Entender que es esto.
 typedef struct TcpHeader {
@@ -79,8 +89,29 @@ typedef struct TcpHeader {
 	ush tcph_chksum;
 	ush tcph_urgptr;
 } tcp_head_t;
+<<<<<<< HEAD
 #define TCPH_S sizeof(tcp_head_t)
+||||||| parent of 513c383 (Cosas nuevas.)
+=======
+#define TCPH_SIZE sizeof(tcp_head_t)
+>>>>>>> 513c383 (Cosas nuevas.)
 
 typedef struct sockaddr_in sockaddr_IN;
+<<<<<<< HEAD
 
+||||||| parent of 513c383 (Cosas nuevas.)
+
+static int ONE = 1;
+static const int *VAL = &ONE;
+
+static ush csum(const ush *buf, const ul nwords);
+
+=======
+static int ONE = 1;
+static const int *VAL = &ONE;
+
+
+static ush csum(const ush *buf, const ul nwords);
+
+>>>>>>> 513c383 (Cosas nuevas.)
 #endif // MAIN_H
